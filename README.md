@@ -84,8 +84,8 @@ CLIENT_URL=http://localhost:5173
 
 ### 1. Clone the repository
 
-```bash
-git clone https://github.com/your-username/taskdesk.git
+````bash
+git clone git remote add origin https://github.com/Emmirez/taskdesk.git
 cd taskdesk
 
 ---
@@ -97,7 +97,7 @@ cd taskdesk
 ```bash
 cd backend
 npm install
-```
+````
 
 #### Frontend
 
@@ -118,7 +118,7 @@ npm run dev
 
 ### Frontend
 
-```bash
+````bash
 npm run dev
 
 ## 🌐 API Endpoints
@@ -185,3 +185,4 @@ Built by **Obaro**
 ## 📄 License
 
 This project is for educational and portfolio purposes.
+````
