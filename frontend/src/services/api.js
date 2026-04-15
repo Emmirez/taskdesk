@@ -1,16 +1,16 @@
 // src/services/api.js
-// Uses relative /api URLs — Vite proxy forwards them to http://localhost:5000
-// No CORS issues because the request comes from the same origin
+const BASE_URL = import.meta.env.VITE_API_URL || "/api"; 
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("accessToken");
 
   const config = {
-    method:  options.method || "GET",
+    method: options.method || "GET",
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
+    credentials: "include", 
   };
 
   if (options.body) {
@@ -18,7 +18,7 @@ async function request(endpoint, options = {}) {
   }
 
   try {
-    const res  = await fetch(`/api${endpoint}`, config);
+    const res  = await fetch(`${BASE_URL}${endpoint}`, config); 
     const data = await res.json();
 
     if (!res.ok) {
@@ -32,7 +32,7 @@ async function request(endpoint, options = {}) {
     return data;
   } catch (err) {
     if (err.name === "TypeError") {
-      throw new Error("Cannot connect to server. Make sure the backend is running on port 5000.");
+      throw new Error("Cannot connect to server.");
     }
     throw err;
   }

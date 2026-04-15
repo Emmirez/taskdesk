@@ -8,7 +8,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import { apiLimiter } from "./middleware/rateLimiter.js";
 import errorHandler from "./middleware/errorHandler.js";
-import taskRoutes     from "./routes/taskRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 
 // Connect DB
 connectDB();
@@ -16,9 +16,17 @@ connectDB();
 const app = express();
 
 //  Middleware
+const allowedOrigins = process.env.CLIENT_URL.split(",");
+
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
