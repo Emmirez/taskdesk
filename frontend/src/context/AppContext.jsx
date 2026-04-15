@@ -1,6 +1,6 @@
 // AppContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
-
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 const AppContext = createContext(null);
 
 async function apiFetch(endpoint, options = {}) {
@@ -13,7 +13,7 @@ async function apiFetch(endpoint, options = {}) {
     },
   };
   if (options.body) config.body = JSON.stringify(options.body);
-  const res  = await fetch(`/api${endpoint}`, config);
+  const res = await fetch(`${BASE_URL}${endpoint}`, config);
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Request failed");
   return data;
