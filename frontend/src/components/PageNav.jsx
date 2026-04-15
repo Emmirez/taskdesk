@@ -1,7 +1,5 @@
 
 //  PageNav.jsx  –  shared navbar for sub-pages
-
-
 export default function PageNav({ dark, toggleDark, onBack, title, rightSlot }) {
   const D      = dark;
   const navBg  = D ? "bg-[#0a0c12]/90 border-white/5" : "bg-white/90 border-slate-200";

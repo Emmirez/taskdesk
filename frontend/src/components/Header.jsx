@@ -53,7 +53,11 @@ export default function Header({ user, onLogout }) {
             />
           </svg>
           <input
-            className={`w-full border rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 transition-all ${T.srchCls}`}
+            className={`w-full border rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 transition-all ${
+              dark
+                ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 focus:ring-violet-500 focus:border-violet-500"
+                : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-violet-500 focus:border-violet-500"
+            }`}
             placeholder="Search tasks…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
