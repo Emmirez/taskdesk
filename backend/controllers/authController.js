@@ -18,6 +18,8 @@ const signRefreshToken = (id) =>
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
   });
 
+
+
 //  Helper: send tokens in response + cookie 
 const sendTokenResponse = (user, statusCode, res) => {
   const accessToken  = signAccessToken(user._id);
@@ -47,9 +49,11 @@ const sendTokenResponse = (user, statusCode, res) => {
     });
 };
 
+const fireAndForget = (promise, label = "email") => {
+  promise.catch((err) => console.error(`[fireAndForget] ${label} failed:`, err));
+};
 
-//  @route   POST /api/auth/register
-//  @access  Public
+
 export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -68,21 +72,19 @@ export const register = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     const verifyURL = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
-    try {
-      await sendVerifyEmail({ name: user.name, email: user.email, verifyURL });
-    } catch (emailErr) {
-      console.error("Verification email failed:", emailErr.message);
-    }
 
-    sendTokenResponse(user, 201, res);
+    fireAndForget(
+      sendVerifyEmail({ name: user.name, email: user.email, verifyURL }),
+      "verify email"
+    );
+
+    sendTokenResponse(user, 201, res); 
   } catch (err) {
     next(err);
   }
 };
 
 
-//  @route   POST /api/auth/login
-//  @access  Public
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -172,45 +174,41 @@ export const getMe = async (req, res, next) => {
 };
 
 
-//  @route   POST /api/auth/forgot-password
-//  @access  Public
 export const forgotPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
-    if (!user) {
-      return res.status(200).json({
-        success: true,
-        message: "If that email exists, a reset link has been sent",
-      });
-    }
+    // Always return the same response (security: don't reveal email existence)
+    res.status(200).json({
+      success: true,
+      message: "If that email exists, a reset link has been sent",
+    });
+
+  
+    if (!user) return;
 
     const resetToken = user.generateResetToken();
     await user.save({ validateBeforeSave: false });
 
     const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    try {
-      await sendPasswordResetEmail({ name: user.name, email: user.email, resetURL });
-    } catch (emailErr) {
-      user.resetPasswordToken   = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save({ validateBeforeSave: false });
-      return next(new Error("Email could not be sent. Please try again later."));
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "If that email exists, a reset link has been sent",
-    });
+    fireAndForget(
+      sendPasswordResetEmail({ name: user.name, email: user.email, resetURL })
+        .catch(async (err) => {
+          // Clean up token if email fails so user can retry
+          user.resetPasswordToken   = undefined;
+          user.resetPasswordExpires = undefined;
+          await user.save({ validateBeforeSave: false });
+          throw err; // re-throw so fireAndForget logs it
+        }),
+      "password reset email"
+    );
   } catch (err) {
     next(err);
   }
 };
 
 
-//  @route   POST /api/auth/reset-password/:token
-//  @access  Public
 export const resetPassword = async (req, res, next) => {
   try {
     const hashedToken = crypto
@@ -242,8 +240,7 @@ export const resetPassword = async (req, res, next) => {
 };
 
 
-//  @route   GET /api/auth/verify-email/:token
-//  @access  Public
+
 export const verifyEmail = async (req, res, next) => {
   try {
     const hashedToken = crypto
@@ -278,8 +275,7 @@ export const verifyEmail = async (req, res, next) => {
 };
 
 
-//  @route   PUT /api/auth/update-password
-//  @access  Private
+
 export const updatePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -309,8 +305,7 @@ export const updatePassword = async (req, res, next) => {
   }
 };
 
-// @route  PUT /api/auth/update-profile
-// @access Private
+
 export const updateProfile = async (req, res, next) => {
   try {
     const { name } = req.body;

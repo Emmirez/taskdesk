@@ -5,7 +5,7 @@ TaskDesk is a modern full-stack task management application built with **React, 
 ---
 
 🌍 Live Demo
-🔗 Frontend: https://your-taskdesk.vercel.app
+🔗 Frontend: https://taskdesk-rho.vercel.app
 🔗 Backend API: https://taskdesk-ubp7.onrender.com
 
 ## 🚀 Tech Stack
