@@ -1,5 +1,6 @@
 // src/services/api.js
-const BASE_URL = import.meta.env.VITE_API_URL || "/api"; 
+// src/services/api.js
+const BASE_URL = "https://taskdesk-ubp7.onrender.com/api";
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("accessToken");
