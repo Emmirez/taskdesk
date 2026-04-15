@@ -85,7 +85,7 @@ CLIENT_URL=http://localhost:5173
 ### 1. Clone the repository
 
 ````bash
-git clone git remote add origin https://github.com/Emmirez/taskdesk.git
+git clone git remote: https://github.com/Emmirez/taskdesk.git
 cd taskdesk
 
 ---
@@ -185,4 +185,4 @@ Built by **Obaro**
 ## 📄 License
 
 This project is for educational and portfolio purposes.
-````
+
